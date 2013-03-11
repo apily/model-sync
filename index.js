@@ -13,10 +13,22 @@
 var request = require('request');
 
 /**
- * Expose `sync`
+ * Expose `Sync`
  */
 
-var sync = module.exports = {};
+module.exports = Sync;
+
+/**
+ * Sync
+ * 
+ * @param {Object} options options
+ * @api public
+ */
+
+function Sync (options) {
+  options = options || {}
+  this.root = options.root || ''; 
+}
 
 /**
  * save
@@ -27,7 +39,7 @@ var sync = module.exports = {};
  * @api public
  */
 
-sync.save = function (callback, context) {
+Sync.prototype.save = function (callback, context) {
   var self = this;
   var root = this.root;
   var data = this.attributes;
@@ -56,7 +68,7 @@ sync.save = function (callback, context) {
  * @api public
  */
 
-sync.update = function (callback, context) {
+Sync.prototype.update = function (callback, context) {
   var self = this;
   var id = this.id;
   var root = this.root;
@@ -86,7 +98,7 @@ sync.update = function (callback, context) {
  * @api public
  */
 
-sync.delete = function (callback, context) {
+Sync.prototype.delete = function (callback, context) {
   var self = this;
   var id = this.id;
   var root = this.root;
