@@ -6,7 +6,8 @@
   "keywords": ["client-side", "MVC", "model", "sync"],
   "scripts": ["index.js"],
   "dependencies": {
-    "apily/model": "*"
+    "apily/model": "*",
+    "apily/request": "*
   },
   "development": {
     "component/assert": "*"
