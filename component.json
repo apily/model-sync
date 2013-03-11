@@ -7,7 +7,7 @@
   "scripts": ["index.js"],
   "dependencies": {
     "apily/model": "*",
-    "apily/request": "*
+    "apily/request": "*"
   },
   "development": {
     "component/assert": "*"
