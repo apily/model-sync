@@ -1,0 +1,15 @@
+{
+  "name": "model-sync",
+  "repo": "apily/model-sync",
+  "version": "0.0.1",
+  "description": "Model sync component",
+  "keywords": ["client-side", "MVC", "model", "sync"],
+  "scripts": ["index.js"],
+  "dependencies": {
+    "apily/model": "*"
+  },
+  "development": {
+    "component/assert": "*"
+  },
+  "license": "MIT"
+}
