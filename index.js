@@ -1,4 +1,3 @@
-
 /**
  * model-sync
  * Model sync model
@@ -32,10 +31,11 @@ sync.save = function (callback, context) {
   var self = this;
   var root = this.root;
   var data = this.attributes;
+  var path = root;
 
   self.emit('saving');
   request
-    .post(root)
+    .post(path)
     .send(data)
     .end(function (res) {
       if (res.ok) {
@@ -58,16 +58,47 @@ sync.save = function (callback, context) {
 
 sync.update = function (callback, context) {
   var self = this;
+  var id = this.id;
   var root = this.root;
   var data = this.attributes;
+  var path = root + '/' + id;
 
   self.emit('saving');
   request
-    .put(root)
+    .put(path)
     .send(data)
     .end(function (res) {
       if (res.ok) {
         self.emit('saved');
+        callback.call(context, null, res.body);
+      } else {
+        callback.call(context, res.body, null);
+      }
+    });  
+};
+
+
+/**
+ * update
+ * Update the model.
+ * 
+ * @param {Function} callback callback
+ * @api public
+ */
+
+sync.delete = function (callback, context) {
+  var self = this;
+  var id = this.id;
+  var root = this.root;
+  var path = root + '/' + id;
+
+  self.emit('deleting');
+  request
+    .delete(path)
+    .send(data)
+    .end(function (res) {
+      if (res.ok) {
+        self.emit('deleted');
         callback.call(context, null, res.body);
       } else {
         callback.call(context, res.body, null);
