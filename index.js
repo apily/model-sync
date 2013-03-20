@@ -11,24 +11,32 @@
  */
 
 var request = require('request');
+var Model = require('model');
 
 /**
- * Expose `Sync`
+ * Expose `ModelSync`
  */
 
-module.exports = Sync;
+module.exports = ModelSync;
 
 /**
- * Sync
+ * ModelSync
  * 
  * @param {Object} options options
  * @api public
  */
 
-function Sync (options) {
+function ModelSync (options) {
   options = options || {}
   this.root = options.root || ''; 
 }
+
+/**
+ * Inherit from `Model`
+ */
+
+ModelSync.prototype = Object.create(Model.prototype);
+ModelSync.prototype.constructor = ModelSync;
 
 /**
  * save
@@ -39,7 +47,7 @@ function Sync (options) {
  * @api public
  */
 
-Sync.prototype.save = function (callback, context) {
+ModelSync.prototype.save = function (callback, context) {
   var self = this;
   var root = this.root;
   var data = this.attributes;
@@ -68,7 +76,7 @@ Sync.prototype.save = function (callback, context) {
  * @api public
  */
 
-Sync.prototype.update = function (callback, context) {
+ModelSync.prototype.update = function (callback, context) {
   var self = this;
   var id = this.id;
   var root = this.root;
@@ -98,7 +106,7 @@ Sync.prototype.update = function (callback, context) {
  * @api public
  */
 
-Sync.prototype.delete = function (callback, context) {
+ModelSync.prototype.delete = function (callback, context) {
   var self = this;
   var id = this.id;
   var root = this.root;
