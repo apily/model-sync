@@ -6,29 +6,28 @@
  * @license MIT
  */ 
 
-/**
- * Dependencies
+/** 
+ * Dependencies.
  */
 
-var request = require('request');
 var Model = require('model');
+var request = require('request');
 
 /**
- * Expose `ModelSync`
+ * Expose `Model`.
  */
 
 module.exports = ModelSync;
 
 /**
- * ModelSync
- * 
- * @param {Object} options options
+ * @constructor ModelSync
+ *
  * @api public
  */
 
 function ModelSync (options) {
-  options = options || {}
-  this.root = options.root || ''; 
+  Model.call(this);
+  this.root = options.root; 
 }
 
 /**
@@ -39,89 +38,116 @@ ModelSync.prototype = Object.create(Model.prototype);
 ModelSync.prototype.constructor = ModelSync;
 
 /**
+ * root
+ */
+
+CocoModel.prototype.root = '';
+
+/**
+ * primary_key
+ */
+
+CocoModel.prototype.primary_key = '_id';
+
+/**
+ * get_id
+ */
+
+CocoModel.prototype.get_id = function () {
+  return this.attributes[this.primary_key];
+};
+
+/**
  * save
- * Save the model.
- * 
- * @param {Function} callback callback
- * @param {Object} context context
+ *
+ * @param {Function} callback
+ *   @param {Object} err error
+ *   @param {Object} res response
+ * @param {Object} context
  * @api public
  */
 
 ModelSync.prototype.save = function (callback, context) {
-  var self = this;
-  var root = this.root;
-  var data = this.attributes;
-  var path = root;
+  var callback = callback || function () {};
+  var model = this;
+  var path = model.root;
+  var data = model.attributes;
+  var primary_key = model.primary_key;
+  var id = data[primary_key];
+  
+  if (id) {
+    model.update(callback, context);
+    return;
+  }
 
-  self.emit('saving');
   request
     .post(path)
-    .send(data)
+    .data(data)
     .end(function (res) {
       if (res.ok) {
-        self.created = true;
-        self.emit('saved');
         callback.call(context, null, res.body);
       } else {
-        callback.call(context, res.body, null);
+        callback.call(context, res.text, null);
       }
-    });  
+    });
 };
 
-/**
+/** 
  * update
- * Update the model.
  * 
- * @param {Function} callback callback
- * @api public
+ * @param {Function} callback
+ *   @param {Object} err error
+ *   @param {Object} res response
+ * @param {Object} context
+ * @api private
  */
 
 ModelSync.prototype.update = function (callback, context) {
-  var self = this;
-  var id = this.id;
-  var root = this.root;
-  var data = this.attributes;
-  var path = root + '/' + id;
+  var callback = callback || function () {};
+  var model = this;
+  var path = model.root;
+  var data = model.attributes;
+  var primary_key = model.primary_key;
+  var id = data[primary_key];
 
-  self.emit('saving');
   request
     .put(path)
-    .send(data)
+    .data(data)
     .end(function (res) {
       if (res.ok) {
-        self.emit('saved');
         callback.call(context, null, res.body);
       } else {
-        callback.call(context, res.body, null);
+        callback.call(context, res.text, null);
       }
-    });  
+    });
 };
 
-
 /**
- * update
- * Update the model.
- * 
- * @param {Function} callback callback
+ * fetch
+ *
+ * @param {Function} callback
+ *   @param {Object} err error
+ *   @param {Object} res response
+ * @param {Object} context
  * @api public
  */
 
-ModelSync.prototype.delete = function (callback, context) {
-  var self = this;
-  var id = this.id;
-  var root = this.root;
-  var path = root + '/' + id;
+ModelSync.prototype.fetch = function (callback, context) {
+  var callback = callback || function () {};
+  var model = this;
+  var path = model.root;
+  var data = model.attributes;
+  var primary_key = model.primary_key;
+  var id = data[primary_key];
 
-  self.emit('deleting');
   request
-    .delete(path)
-    .send(data)
+    .get(path + '/' + id)
     .end(function (res) {
       if (res.ok) {
-        self.emit('deleted');
+        model.set(res.body)
         callback.call(context, null, res.body);
       } else {
-        callback.call(context, res.body, null);
+        callback.call(context, res.text, null);
       }
-    });  
+    });
 };
