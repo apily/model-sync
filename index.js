@@ -1,10 +1,11 @@
-/**
+
+/** !
  * model-sync
- * Model sync model
  *
- * @copyright 2012 Enrico Marino and Federico Spini
- * @license MIT
- */ 
+ * @author Enrico Marino and Federico Spini
+ * @copyright 2013 Enrico Marino and Federico Spini
+ * @licence MIT
+ */
 
 /** 
  * Dependencies.
@@ -20,14 +21,20 @@ var request = require('request');
 module.exports = ModelSync;
 
 /**
- * @constructor ModelSync
+ * @constructor Model
  *
  * @api public
  */
 
-function ModelSync (options) {
-  Model.call(this);
-  this.root = options.root; 
+function ModelSync (attributes, options) {
+  var attributes = attributes || {};
+  var options = options || {};
+
+  Model.call(this, attributes, options);
+
+  if (options.root) {
+    this.root = options.root; 
+  }
 }
 
 /**
@@ -41,20 +48,63 @@ ModelSync.prototype.constructor = ModelSync;
  * root
  */
 
-CocoModel.prototype.root = '';
+ModelSync.prototype.root = '';
 
 /**
  * primary_key
  */
 
-CocoModel.prototype.primary_key = '_id';
+ModelSync.prototype.primary_key = '_id';
 
 /**
- * get_id
+ * id
+ * Get the model id. 
+ * 
+ * @return {String} the model id.
+ * @api public
  */
 
-CocoModel.prototype.get_id = function () {
-  return this.attributes[this.primary_key];
+ModelSync.prototype.id = function () {
+  if (this._id) {
+    return this._id;
+  }
+
+  this._id = this.attributes[this.primary_key];
+  return this._id;
+};
+
+/**
+ * url
+ * Get the model url.
+ *
+ * @param {String} [path] path to append to the url
+ * @return {String} the model url.
+ * @api public
+ */
+
+ModelSync.prototype.url = function () {
+  if (this._url) {
+    return this._url;
+  }
+
+  var url = this.root;
+  var collection = this.collection;
+  var id = this.attributes[this.primary_key];
+
+  if (collection) {
+    url += collection.url();
+  }
+  if (id) {
+    url += url.charAt(url.length - 1) === '/' ? '' : '/';
+    url += encodeURIComponent(id);
+  }
+  if (path) {
+    url += '/';
+    url += path;
+  }
+
+  this._url = url;
+  return url;
 };
 
 /**
@@ -69,11 +119,8 @@ CocoModel.prototype.get_id = function () {
 
 ModelSync.prototype.save = function (callback, context) {
   var callback = callback || function () {};
-  var model = this;
-  var path = model.root;
-  var data = model.attributes;
-  var primary_key = model.primary_key;
-  var id = data[primary_key];
+  var id = this.id();
+  var url = this.url();
   
   if (id) {
     model.update(callback, context);
@@ -81,7 +128,7 @@ ModelSync.prototype.save = function (callback, context) {
   }
 
   request
-    .post(path)
+    .post(url)
     .data(data)
     .end(function (res) {
       if (res.ok) {
@@ -104,11 +151,7 @@ ModelSync.prototype.save = function (callback, context) {
 
 ModelSync.prototype.update = function (callback, context) {
   var callback = callback || function () {};
-  var model = this;
-  var path = model.root;
-  var data = model.attributes;
-  var primary_key = model.primary_key;
-  var id = data[primary_key];
+  var url = this.url();
 
   request
     .put(path)
@@ -135,13 +178,10 @@ ModelSync.prototype.update = function (callback, context) {
 ModelSync.prototype.fetch = function (callback, context) {
   var callback = callback || function () {};
   var model = this;
-  var path = model.root;
-  var data = model.attributes;
-  var primary_key = model.primary_key;
-  var id = data[primary_key];
+  var url = this.url;
 
   request
-    .get(path + '/' + id)
+    .get(url)
     .end(function (res) {
       if (res.ok) {
         model.set(res.body)
