@@ -1,4 +1,3 @@
-
 /** !
  * model-sync
  *
@@ -11,14 +10,13 @@
  * Dependencies.
  */
 
-var Model = require('model');
 var request = require('request');
 
 /**
  * Expose `Model`.
  */
 
-module.exports = ModelSync;
+module.exports = Model;
 
 /**
  * @constructor Model
@@ -26,35 +24,21 @@ module.exports = ModelSync;
  * @api public
  */
 
-function ModelSync (attributes, options) {
-  var attributes = attributes || {};
-  var options = options || {};
-
-  Model.call(this, attributes, options);
-
-  if (options.root) {
-    this.root = options.root; 
-  }
+function Model (options) {
+  this.attributes = {};
 }
-
-/**
- * Inherit from `Model`
- */
-
-ModelSync.prototype = Object.create(Model.prototype);
-ModelSync.prototype.constructor = ModelSync;
 
 /**
  * root
  */
 
-ModelSync.prototype.root = '';
+Model.prototype.root = '';
 
 /**
  * primary_key
  */
 
-ModelSync.prototype.primary_key = '_id';
+Model.prototype.primary_key = '_id';
 
 /**
  * id
@@ -64,7 +48,7 @@ ModelSync.prototype.primary_key = '_id';
  * @api public
  */
 
-ModelSync.prototype.id = function () {
+Model.prototype.id = function () {
   if (this._id) {
     return this._id;
   }
@@ -77,12 +61,11 @@ ModelSync.prototype.id = function () {
  * url
  * Get the model url.
  *
- * @param {String} [path] path to append to the url
  * @return {String} the model url.
  * @api public
  */
 
-ModelSync.prototype.url = function () {
+Model.prototype.url = function () {
   if (this._url) {
     return this._url;
   }
@@ -97,10 +80,6 @@ ModelSync.prototype.url = function () {
   if (id) {
     url += url.charAt(url.length - 1) === '/' ? '' : '/';
     url += encodeURIComponent(id);
-  }
-  if (path) {
-    url += '/';
-    url += path;
   }
 
   this._url = url;
@@ -117,7 +96,7 @@ ModelSync.prototype.url = function () {
  * @api public
  */
 
-ModelSync.prototype.save = function (callback, context) {
+Model.prototype.save = function (callback, context) {
   var callback = callback || function () {};
   var id = this.id();
   var url = this.url();
@@ -129,7 +108,7 @@ ModelSync.prototype.save = function (callback, context) {
 
   request
     .post(url)
-    .data(data)
+    .send(data)
     .end(function (res) {
       if (res.ok) {
         callback.call(context, null, res.body);
@@ -149,13 +128,14 @@ ModelSync.prototype.save = function (callback, context) {
  * @api private
  */
 
-ModelSync.prototype.update = function (callback, context) {
+Model.prototype.update = function (callback, context) {
   var callback = callback || function () {};
   var url = this.url();
+  var data = this.attributes;
 
   request
-    .put(path)
-    .data(data)
+    .put(url)
+    .send(data)
     .end(function (res) {
       if (res.ok) {
         callback.call(context, null, res.body);
@@ -175,16 +155,15 @@ ModelSync.prototype.update = function (callback, context) {
  * @api public
  */
 
-ModelSync.prototype.fetch = function (callback, context) {
+Model.prototype.fetch = function (callback, context) {
   var callback = callback || function () {};
   var model = this;
-  var url = this.url;
+  var url = model.url();
 
   request
     .get(url)
     .end(function (res) {
       if (res.ok) {
-        model.set(res.body)
         callback.call(context, null, res.body);
       } else {
         callback.call(context, res.text, null);
