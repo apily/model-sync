@@ -11,12 +11,13 @@
  */
 
 var request = require('request');
+var Model = require('model');
 
 /**
- * Expose `Model`.
+ * Expose `ModelSync`.
  */
 
-module.exports = Model;
+module.exports = ModelSync;
 
 /**
  * @constructor Model
@@ -24,21 +25,28 @@ module.exports = Model;
  * @api public
  */
 
-function Model (options) {
-  this.attributes = {};
+function ModelSync (options) {
+  Model.call(this, options);
 }
+
+/**
+ * Inherit from `Model`
+ */
+
+ModelSync.prototype = Object.create(Model.prototype);
+ModelSync.prototype.constructor = ModelSync;
 
 /**
  * root
  */
 
-Model.prototype.root = '';
+ModelSync.prototype.root = '';
 
 /**
  * primary_key
  */
 
-Model.prototype.primary_key = '_id';
+ModelSync.prototype.primary_key = '_id';
 
 /**
  * id
@@ -48,7 +56,7 @@ Model.prototype.primary_key = '_id';
  * @api public
  */
 
-Model.prototype.id = function () {
+ModelSync.prototype.id = function () {
   if (this._id) {
     return this._id;
   }
@@ -65,7 +73,7 @@ Model.prototype.id = function () {
  * @api public
  */
 
-Model.prototype.url = function () {
+ModelSync.prototype.url = function () {
   if (this._url) {
     return this._url;
   }
@@ -96,10 +104,12 @@ Model.prototype.url = function () {
  * @api public
  */
 
-Model.prototype.save = function (callback, context) {
-  var callback = callback || function () {};
-  var id = this.id();
-  var url = this.url();
+ModelSync.prototype.save = function (callback, context) {
+  callback = callback || function () {};
+  var model = this;
+  var id = model.id();
+  var url = model.url();
+  var data = model.attributes;
   
   if (id) {
     model.update(callback, context);
@@ -128,10 +138,11 @@ Model.prototype.save = function (callback, context) {
  * @api private
  */
 
-Model.prototype.update = function (callback, context) {
-  var callback = callback || function () {};
-  var url = this.url();
-  var data = this.attributes;
+ModelSync.prototype.update = function (callback, context) {
+  callback = callback || function () {};
+  var model = this;
+  var url = model.url();
+  var data = model.attributes;
 
   request
     .put(url)
@@ -155,7 +166,7 @@ Model.prototype.update = function (callback, context) {
  * @api public
  */
 
-Model.prototype.fetch = function (callback, context) {
+ModelSync.prototype.fetch = function (callback, context) {
   var callback = callback || function () {};
   var model = this;
   var url = model.url();
@@ -164,7 +175,8 @@ Model.prototype.fetch = function (callback, context) {
     .get(url)
     .end(function (res) {
       if (res.ok) {
-        callback.call(context, null, res.body);
+        model.set(res.body);
+        callback.call(context, null, model);
       } else {
         callback.call(context, res.text, null);
       }
