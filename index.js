@@ -25,7 +25,7 @@ module.exports = ModelSync;
  * @api public
  */
 
-function ModelSync (attribuets, options) {
+function ModelSync (attributes, options) {
   Model.call(this, attributes, options);
 }
 
