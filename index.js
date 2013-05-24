@@ -25,8 +25,8 @@ module.exports = ModelSync;
  * @api public
  */
 
-function ModelSync (options) {
-  Model.call(this, options);
+function ModelSync (attribuets, options) {
+  Model.call(this, attributes, options);
 }
 
 /**
@@ -80,16 +80,16 @@ ModelSync.prototype.url = function () {
 
   var url = this.root;
   var collection = this.collection;
-  var id = this.attributes[this.primary_key];
+  var id = this.id();
 
   if (collection) {
     url += collection.url();
   }
   if (id) {
-    url += url.charAt(url.length - 1) === '/' ? '' : '/';
     url += encodeURIComponent(id);
   }
-
+  url = url.replace(/\/\//, '/');
+  
   this._url = url;
   return url;
 };
