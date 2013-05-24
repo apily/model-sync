@@ -167,7 +167,7 @@ ModelSync.prototype.update = function (callback, context) {
  */
 
 ModelSync.prototype.fetch = function (callback, context) {
-  var callback = callback || function () {};
+  callback = callback || function () {};
   var model = this;
   var url = model.url();
 
