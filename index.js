@@ -86,9 +86,10 @@ ModelSync.prototype.url = function () {
     url += collection.url();
   }
   if (id) {
+    url += '/';
     url += encodeURIComponent(id);
   }
-  url = url.replace(/\/\//, '/');
+  url = url.replace(/\/\/+/, '/');
   
   this._url = url;
   return url;
