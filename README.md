@@ -20,6 +20,20 @@ var m = Mode();
 //...
 ```
 
+- - -
+
+## API
+
+### model#id()
+
+### model#url()
+
+### model#save()
+
+### model#fetch()
+
+- - -
+
 ## License
 
 (The MIT License)
