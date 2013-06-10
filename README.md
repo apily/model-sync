@@ -1,10 +1,24 @@
 # model-sync
 
-Model sync component
+sync plugin for model
 
 ## Installation
 
     $ component install apily/model-sync
+
+## Usage
+
+```js
+var model = require('model');
+var sync = require('model-sync');
+
+var Model = model();
+
+Model.use(sync);
+
+var m = Mode();
+//...
+```
 
 ## License
 
