@@ -16,7 +16,7 @@ module.exports = function (model) {
    * Component dependencies.
    */
   
-  var request = require('request');
+  model.request = require('request');
 
   /**
    * root
@@ -99,7 +99,7 @@ module.exports = function (model) {
       return;
     }
   
-    request
+    model.request
       .post(url)
       .send(data)
       .end(function (res) {
@@ -127,7 +127,7 @@ module.exports = function (model) {
     var url = model.url();
     var data = model.attributes;
   
-    request
+    model.request
       .put(url)
       .send(data)
       .end(function (res) {
@@ -154,7 +154,7 @@ module.exports = function (model) {
     var model = this;
     var url = model.url();
   
-    request
+    model.request
       .get(url)
       .end(function (res) {
         if (res.ok) {
